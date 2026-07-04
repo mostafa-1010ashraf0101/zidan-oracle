@@ -1,18 +1,24 @@
 const express = require('express');
-// استدعاء الدالة من ملفها الخاص
-const { analyzeProfitability } = require('./profit_engine'); 
-
 const app = express();
 app.use(express.json());
 
+// استدعاء الموديول مباشرة
+const engine = require('./profit_engine');
+
 app.post('/webhook/shopify-order', async (req, res) => {
-    const orderData = req.body;
-    
-    // هنا بنستخدم الدالة اللي استدعيناها
-    const report = await analyzeProfitability(orderData);
-    
-    console.log("إشعار الواتساب للتاجر:", report);
-    res.status(200).send("تم الاستلام");
+    try {
+        const orderData = req.body;
+        // استخدام الدالة من خلال الـ engine object
+        const report = await engine.analyzeProfitability(orderData);
+        
+        console.log("إشعار الواتساب للتاجر:", report);
+        res.status(200).send("تم الاستلام بنجاح");
+    } catch (error) {
+        console.error("خطأ في المعالجة:", error);
+        res.status(500).send("خطأ داخلي");
+    }
 });
 
-app.listen(3000, () => console.log('السيرفر شغال'));
+// Render بيحتاج الـ Port ده عشان يشتغل، اتأكد إنك حاطه
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`السيرفر شغال على بورت ${PORT}`));
