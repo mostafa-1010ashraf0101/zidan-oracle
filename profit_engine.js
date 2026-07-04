@@ -1,31 +1,15 @@
-// Zidan WhatsApp-Oracle (المنتج النهائي)
 const { GoogleGenAI } = require('@google/genai');
-const ai = new GoogleGenAI({ apiKey: 'AIzaSyBxJQIuYat7DgRIT-cOLJ02yw_CTtK_BTQ' });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-async function sendWhatsAppReport(data) {
+// 1. تعريف الدالة هنا (تأكد إن الاسم مطابقة)
+async function analyzeProfitability(order) {
     const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
     
-    // تحسين البرومبت عشان يكون 'إدماني'
-    const prompt = `
-    أنت نظام Zidan Oracle. التاجر بيستلم التقرير ده على الواتساب كل يوم.
-    البيانات: ${JSON.stringify(data)}
-    الربح الصافي = (المبيعات - الصرف - الشحن - تكلفة البضاعة).
+    const prompt = `حلل البيانات دي: ${JSON.stringify(order)}...`;
     
-    اكتب رسالة واتساب (قصيرة جداً، فخمة، ومباشرة):
-    1. ابدأ برقم الربح الصافي.
-    2. ادي 'نصيحة ذهبية' في سطر واحد بناءً على الأرقام.
-    3. خلي التاجر يحس إنه "محترف".
-    `;
-
     const result = await model.generateContent(prompt);
-    
-    // هنا مكان ربط API الواتساب (قريباً)
-    console.log("--- إشعار واتساب للتاجر ---");
-    console.log(result.response.text());
-    console.log("--------------------------");
+    return result.response.text();
 }
 
-const dailyData = { sales: 22000, adsSpend: 6000, shipping: 1500, cogs: 8000 };
-sendWhatsAppReport(dailyData);
-
+// 2. تصدير الدالة بعد ما اتعرفت (ده السطر اللي كان بيعمل مشكلة)
 module.exports = { analyzeProfitability };
